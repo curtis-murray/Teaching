@@ -1,0 +1,87 @@
+library(tidyverse)
+#dev.new(noRStudioGD = T)
+
+#  -----------------------------Real data (HIDDEN) -----------------------------
+height <- runif(100,0,100)
+
+a_true = 23.512
+b_true = 0
+
+noise = rnorm(n = length(height), 0,10)
+
+weight <- a_true*height + b_true + noise
+
+#  ----------------------------- Real data plot
+
+df <- tibble(height,weight)
+
+df %>% 
+	ggplot() +
+	geom_point(aes(x = height, y = weight)) + 
+	theme_bw() + 
+	labs(x = "Height (cm)", y = "Weight (kg)", title = "Relationship between alien hippo height and weight")
+
+#  ----------------------------- Guess  -----------------------------
+
+a = a_calc
+weight_prediction = a*height
+
+#  ----------------------------- Plot  -----------------------------
+
+df <- tibble(height, weight, weight_prediction) 
+
+
+df %>% 
+	ggplot() + 
+	geom_point(aes(x = height, y = weight, group = "true"), color = "black") +
+	theme_bw() +
+	theme(legend.position = "bottom") + 
+	labs(color = "") + 
+	geom_line(aes(x = height, weight_prediction),color = "blue") +
+	geom_point(aes(x = height, y = weight_prediction),color = "blue") + 
+	geom_segment(aes(x = height, xend = height, y = weight, yend = weight_prediction, group = as.factor(height)),color = "red", linetype = "dotted")
+
+#  ----------------------------- Errors  -----------------------------
+
+errors = weight_prediction - weight
+# Mean squared error
+mse = mean((weight_prediction-y_true)^2)
+mse
+
+find_mse <- function(a){
+	weight_prediction = a*height
+	error = weight - weight_prediction
+	mse = mean(error^2)
+	return(mse)
+}
+
+find_mse(a = 7)
+
+# ----- Trial and Error
+
+a_seq = seq(20,30, 0.001)
+a_seq
+
+df_mse <- tibble(a = a_seq) %>% 
+	mutate(mse = sapply(a,find_mse))
+
+df_mse %>% 
+	ggplot() + 
+	geom_point(aes(a, mse)) + 
+	theme_bw() + 
+	labs(y = "Mean Squared Error")
+
+a_trial_and_error <- df_mse %>% 
+	filter(mse == min(mse)) %>% 
+	pull(a)
+
+a_trial_and_error
+
+# ------ Calculus approach
+
+a_calc = sum(y_true*x)/sum(x^2)
+a_trial_and_error
+
+# -------- Using R
+lm(formula = weight~height-1, df)
+

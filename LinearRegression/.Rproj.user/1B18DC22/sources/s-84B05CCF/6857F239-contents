@@ -1,0 +1,130 @@
+---
+title: "Linear Regression Explained"
+author: "Curtis Murray"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+
+#  -----------------------------Real data (HIDDEN) -----------------------------
+height <- runif(100,0,100)
+
+a_true = 23.512
+b_true = 0
+
+noise = rnorm(n = length(height), 0,80)
+
+weight <- a_true*height + b_true + noise
+```
+# Setup
+
+## Installing and loading tidyverse
+
+Before we start any of the fun stuff, we need to get R setup!
+
+We're going to be making use of a library called tidyverse, a collection of packages that really useful for data science.
+
+To install tidyverse we can run the below command. Note that we only need to run this if we haven't installed tidyverse before.
+
+```{r}
+install.packages("tidyverse")
+```
+
+This installs the package, but we can't actually use it unless we load it up!
+
+```{r}
+library(tidyverse)
+```
+
+## Reading in data
+
+The next thing that we're going to do is read in our data.
+
+
+```{r}
+df <- 
+
+```
+
+df %>% 
+	ggplot() +
+	geom_point(aes(x = height, y = weight)) + 
+	theme_bw() + 
+	labs(x = "Height (cm)", y = "Weight (kg)", 
+			 title = "Alien hippo height and weight")
+
+a = a_calc_method
+
+weight_guess = a*height
+
+df %>% 
+	ggplot() +
+	geom_point(aes(x = height, y = weight)) + 
+	theme_bw() + 
+	labs(x = "Height (cm)", y = "Weight (kg)", 
+			 title = "Alien hippo height and weight") +
+	geom_line(aes(x = height, y = weight_guess), colour = "blue") + 
+	geom_point(aes(x = height, y = weight_guess), colour = "blue") + 
+	geom_segment(aes(x = height, xend = height, y = weight, 
+									 yend = weight_guess), color = "red", 
+							 linetype = "dotted")
+
+errors = weight_guess - weight
+
+df %>% 
+	mutate(weight_guess = weight_guess, errors = errors) %>% 
+	mutate(squared_errors = errors^2) %>% 
+	summarise(mse = mean(squared_errors)) %>% 
+	pull(mse)
+
+find_mse <- function(a){
+	weight_guess = a*height
+	error = weight_guess - weight
+	mse = mean(error^2)
+	return(mse)
+}
+
+find_mse(25)
+
+
+a_seq = seq(20,30,0.001)
+
+length(a_seq)
+
+df_mse <- tibble(a = a_seq) %>% 
+	mutate(mse = sapply(a, find_mse))
+
+
+
+df_mse %>% 
+	ggplot() + 
+	geom_point(aes(x = a, y = mse)) + 
+	lims(y = c(0,NA))
+
+
+best_guess <- df_mse %>% 
+	filter(mse == min(mse)) 
+best_guess %>% 
+	pull(a)
+best_guess
+
+a_calc_method = sum(weight*height)/sum(height^2)
+
+# --------
+
+res <- lm(formula = weight~height, data = df)
+
+res$coefficients
+a_calc_method
+
+
+
+a*x^2/(b*e^(x)+
+```
